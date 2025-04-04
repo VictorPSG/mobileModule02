@@ -10,7 +10,7 @@ import { WeatherIcon } from '../assets/weatherIcon.js';
 import { getWeatherDescription } from '../weatherDescription.js';
 import { styles } from '../styles/styles.js';
 
-export const CurrentlyScreen = ({ weatherData, loading, error }) => {
+export const CurrentlyScreen = ({ weatherData, loading, error, State }) => {
 	if (loading) {
 	  return (
 		<View style={styles.screenContainer}>
@@ -29,9 +29,9 @@ export const CurrentlyScreen = ({ weatherData, loading, error }) => {
   
 	return (
 	  <View style={styles.screenContainer}>
-		<Text style={styles.screenTitle}>Agora</Text>
 		{weatherData && (
 		  <View style={styles.weatherContainer}>
+			<Text style={styles.cityName}>{State}</Text>
 			<Text style={styles.cityName}>
 			  {weatherData.cityName}
 			</Text>

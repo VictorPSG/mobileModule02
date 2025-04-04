@@ -29,17 +29,17 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [weatherData, setWeatherData] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
+  const [State, setState] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   useEffect(() => {
-    getCurrentLocation();
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
-
+  
     if (searchQuery.length > 2) {
       setLoading(true);
       const timer = setTimeout(() => {
@@ -47,16 +47,21 @@ const App = () => {
       }, 500);
       setDebounceTimeout(timer);
     } else {
+      setLoading(false);
       setSuggestions([]);
       setShowSuggestions(false);
     }
-
+  
     return () => {
       if (debounceTimeout) {
         clearTimeout(debounceTimeout);
       }
     };
   }, [searchQuery]);
+  
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
 
   const fetchCitySuggestions = async (query) => {
     try {
@@ -69,7 +74,6 @@ const App = () => {
       }
   
       const data = await response.json();
-      
       if (!Array.isArray(data)) {
         throw new Error('Formato de dados inválido da API');
       }
@@ -78,14 +82,12 @@ const App = () => {
       const filteredData = data.filter(item => 
         item.lat && item.lon
       );
-  
       // Ordenação por relevância (Brasil primeiro)
       filteredData.sort((a, b) => {
         if (a.country === 'BR' && b.country !== 'BR') return -1;
         if (a.country !== 'BR' && b.country === 'BR') return 1;
         return 0;
       });
-  
       setSuggestions(filteredData.slice(0, 5));
       setError(null);
     } catch (err) {
@@ -97,19 +99,19 @@ const App = () => {
     }
   };
 
-  const fetchWeatherData = async (lat, lon, cityName = 'Local atual') => {
+  const fetchWeatherData = async (lat, lon, cityName = 'Local atual', state) => {
     setLoading(true);
     setError(null);
     
     try {
       const response = await fetch(
-        `${OPEN_METEO_URL}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,surface_pressure,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,wind_speed_10m_max&timezone=auto&forecast_days=7`
+        `${OPEN_METEO_URL}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,surface_pressure,wind_speed_10m&hourly=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,wind_speed_10m_max&timezone=auto&forecast_days=7`
       );
       
       if (!response.ok) {
         throw new Error(`Erro ao buscar dados: ${response.status}`);
       }
-
+  
       const data = await response.json();
       const formattedData = {
         cityName,
@@ -124,6 +126,7 @@ const App = () => {
           time,
           temperature_2m: data.hourly.temperature_2m[index],
           weather_code: data.hourly.weather_code[index],
+          wind_speed_10m: data.hourly.wind_speed_10m[index],
         })),
         daily: {
           time: data.daily.time,
@@ -136,7 +139,9 @@ const App = () => {
           wind_speed_10m_max: data.daily.wind_speed_10m_max,
         }
       };
-
+      if(state){
+        setState(state);
+      }
       setWeatherData(formattedData);
     } catch (err) {
       console.error('Erro ao buscar dados do tempo:', err);
@@ -152,7 +157,12 @@ const App = () => {
     setSearchQuery(displayText);
     setShowSuggestions(false);
     Keyboard.dismiss();
-    fetchWeatherData(city.lat, city.lon, displayName);
+    
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+      setDebounceTimeout(null);
+    }
+    fetchWeatherData(city.lat, city.lon, displayText, city.state);
   };
 
   const getCurrentLocation = async () => {
@@ -166,23 +176,21 @@ const App = () => {
       if (status !== 'granted') {
         throw new Error('Permissão de localização negada');
       }
-  
       // 2. Obter coordenadas atuais
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
   
       // 3. Obter nome da cidade usando reverse geocoding
       const cityName = await getCityName(latitude, longitude);
-      
       // 4. Buscar dados meteorológicos com o nome da cidade
       await fetchWeatherData(
         latitude, 
         longitude,
         cityName || 'Minha localização'
+
       );
     } catch (err) {
-      console.error('Erro ao obter localização:', err);
-      setError('Não foi possível obter sua localização');
+      setError('Erro ao obter localização\n' + err);
     } finally {
       setLoading(false);
     }
@@ -200,10 +208,11 @@ const App = () => {
       }
   
       const data = await response.json();
-      
+      setState(data[0].state);
+      const name_and_country = data[0].local_names.pt + ", " + data[0].country;
       if (Array.isArray(data) && data.length > 0) {
         // Retorna o nome local em português se disponível, senão o nome padrão
-        return data[0].local_names?.pt || data[0].name;
+        return name_and_country || data[0].name;
       }
       
       return null;
@@ -253,13 +262,13 @@ const App = () => {
           })}
         >
           <Tab.Screen name="Currently">
-            {() => <CurrentlyScreen weatherData={weatherData} loading={loading} error={error} />}
+            {() => <CurrentlyScreen weatherData={weatherData} loading={loading} error={error} State={State}/>}
           </Tab.Screen>
           <Tab.Screen name="Today">
-            {() => <TodayScreen weatherData={weatherData} loading={loading} error={error} />}
+            {() => <TodayScreen weatherData={weatherData} loading={loading} error={error} State={State}/>}
           </Tab.Screen>
           <Tab.Screen name="Weekly">
-            {() => <WeeklyScreen weatherData={weatherData} loading={loading} error={error} />}
+            {() => <WeeklyScreen weatherData={weatherData} loading={loading} error={error} State={State}/>}
           </Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>

@@ -1,13 +1,5 @@
-import { 
-  SafeAreaView, 
-  StatusBar, 
+import {
   Text, 
-  View, 
-  TextInput, 
-  TouchableOpacity,
-  FlatList,
-  Keyboard,
-  ActivityIndicator
 } from 'react-native';
 import { styles } from "../styles";
 

@@ -9,7 +9,7 @@ import { WeatherIcon } from "../assets/weatherIcon";
 import { getWeatherDescription } from "../weatherDescription";
 import { styles } from "../styles";
 
-export const WeeklyScreen = ({ weatherData, loading, error }) => {
+export const WeeklyScreen = ({ weatherData, loading, error, State }) => {
 	if (loading) {
 	  return (
 		<View style={styles.screenContainer}>
@@ -28,7 +28,8 @@ export const WeeklyScreen = ({ weatherData, loading, error }) => {
   
 	return (
 	  <View style={styles.screenContainer}>
-		<Text style={styles.screenTitle}>Semanal</Text>
+		<Text style={styles.screenTitle}>{State}</Text>
+		<Text style={styles.screenTitle}>{weatherData?.cityName}</Text>
 		{weatherData && (
 		  <FlatList
 			data={weatherData.daily.time.map((time, index) => ({
