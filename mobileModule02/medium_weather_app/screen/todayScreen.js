@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import { 
-  Text, 
+import {
+  Text,
   View,
   FlatList,
   ActivityIndicator,
@@ -30,7 +30,7 @@ export const TodayScreen = ({ weatherData, loading, error, State }) => {
     <View style={styles.container}>
       <Text style={styles.title}>{State}</Text>
       <Text style={styles.title}>{weatherData?.cityName}</Text>
-      
+
       {weatherData && (
         <FlatList
           data={weatherData.hourly.slice(0, 24)}
@@ -40,14 +40,14 @@ export const TodayScreen = ({ weatherData, loading, error, State }) => {
               <Text style={styles.timeText}>
                 {new Date(item.time).getHours()}h
               </Text>
-              
+
               <View style={styles.weatherInfo}>
                 <WeatherIcon code={item.weather_code} size={24} />
                 <Text style={styles.tempText}>
                   {Math.round(item.temperature_2m)}°
                 </Text>
               </View>
-              
+
               <Text style={styles.windText}>
                 {Math.round(item.wind_speed_10m)} km/h
               </Text>
@@ -70,13 +70,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    //backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
-	  fontWeight: 'bold',
-	  marginBottom: 20,
-	  color: '#333',
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
   },
   header: {
     flexDirection: 'row',
@@ -117,9 +117,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorText: {
-	  fontSize: 16,
-	  color: 'red',
-	  textAlign: 'center',
-	  marginTop: 20,
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
