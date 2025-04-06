@@ -15,7 +15,8 @@ export const styles = StyleSheet.create({
 		fontSize: 24,
 		fontWeight: 'bold',
 		marginBottom: 20,
-		color: '#333',
+		color: '#f3f2ef',
+		textAlign: 'center',
 	},
 	weatherContainer: {
 		padding: '16',
@@ -31,7 +32,6 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		// marginVertical: 20,
 	},
 	weatherIcon: {
 		fontSize: 60,
@@ -43,16 +43,13 @@ export const styles = StyleSheet.create({
 		color: '#f3f2ef',
 	},
 	weatherDescription: {
-		// fontSize: 18,
 		fontWeight: 'bold',
 		textAlign: 'center',
 		color: 'rgb(253 233 183)',
-		// textTransform: 'capitalize',
 	},
 	weatherDetails: {
 		flexDirection: 'row',
 		justifyContent: 'space-around',
-		// marginTop: 20,
 	},
 	detailItem: {
 		alignItems: 'center',

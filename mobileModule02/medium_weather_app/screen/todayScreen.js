@@ -52,38 +52,34 @@ export const TodayScreen = ({ weatherData, loading, error, State }) => {
         {weatherData?.cityName}
       </Text>
 
-      {/* GRÁFICO DE TEMPERATURA */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <LineChart
-          data={{
-            labels: hours.filter((_, i) => i % 2 === 0),
-            datasets: [{ data: temperatures }],
-          }}
-          width={screenWidth - 32}
-          height={330}
-          yAxisSuffix="°"
-          chartConfig={{
-            backgroundColor: '#1F2C2F',
-            backgroundGradientFrom: '#1F2C2F',
-            backgroundGradientTo: '#1F2C2F',
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(245, 210, 124, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            propsForDots: {
-              r: '5',
-              strokeWidth: '2',
-              stroke: '#F5D27C',
-            },
-          }}
-          bezier
-          style={{
-            borderRadius: 16,
-            marginBottom: 24,
-          }}
-        />
-      </ScrollView>
+      <LineChart
+        data={{
+          labels: hours.filter((_, i) => i % 2 === 0),
+          datasets: [{ data: temperatures }],
+          legend: ["Temperatura em °C"],
+        }}
+        width={screenWidth - 32}
+        height={330}
+        yAxisSuffix="°"
+        chartConfig={{
+          backgroundColor: '#1F2C2F',
+          backgroundGradientFrom: '#1F2C2F',
+          backgroundGradientTo: '#1F2C2F',
+          decimalPlaces: 0,
+          color: (opacity = 1) => `rgba(245, 210, 124, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          propsForDots: {
+            r: '5',
+            strokeWidth: '2',
+            stroke: '#F5D27C',
+          },
+        }}
+        bezier
+        style={{
+          borderRadius: 16,
+        }}
+      />
 
-      {/* FLATLIST HORIZONTAL COM HORAS */}
       <FlatList
         horizontal
         data={weatherData.hourly.slice(0, 24)}
@@ -94,7 +90,7 @@ export const TodayScreen = ({ weatherData, loading, error, State }) => {
               <Text style={styles.timeText}>
                 {new Date(item.time).getHours()}h
               </Text>
-              <WeatherIcon code={item.weather_code} size={24} />
+              <WeatherIcon code={item.weather_code} size={32} />
               <Text style={styles.tempText}>
                 {Math.round(item.temperature_2m)}°
               </Text>
@@ -133,11 +129,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     paddingHorizontal: 4,
-    paddingBottom: 100,
+    paddingBottom: 70,
   },
   weatherInfo: {
     width: 100,
-    height: 120,
+    height: 112,
     borderRadius: 24,
     backgroundColor: 'rgba(0,0,0,0.25)',
     borderWidth: 1,

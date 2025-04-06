@@ -101,7 +101,6 @@ const App = () => {
       const filteredData = data.filter(item =>
         item.lat && item.lon
       );
-      // Ordenação por relevância (Brasil primeiro)
       filteredData.sort((a, b) => {
         if (a.country === 'BR' && b.country !== 'BR') return -1;
         if (a.country !== 'BR' && b.country === 'BR') return 1;
