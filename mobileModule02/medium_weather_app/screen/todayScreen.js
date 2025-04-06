@@ -5,9 +5,15 @@ import {
   View,
   FlatList,
   ActivityIndicator,
-  StyleSheet
+  StyleSheet,
+  ScrollView,
+  Dimensions,
 } from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
 import { WeatherIcon } from '../assets/weatherIcon.js';
+import { MaterialIcons } from '@expo/vector-icons';
+
+const screenWidth = Dimensions.get('window').width;
 
 export const TodayScreen = ({ weatherData, loading, error, State }) => {
   if (loading) {
@@ -26,43 +32,86 @@ export const TodayScreen = ({ weatherData, loading, error, State }) => {
     );
   }
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{State}</Text>
-      <Text style={styles.title}>{weatherData?.cityName}</Text>
+  if (!weatherData || !weatherData.hourly) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: '#fff' }}>Carregando previsão do tempo...</Text>
+      </View>
+    );
+  }
 
-      {weatherData && (
-        <FlatList
-          data={weatherData.hourly.slice(0, 24)}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.hourItem}>
+  const hourlyData = weatherData.hourly.slice(0, 12);
+  const temperatures = hourlyData.map(item => item.temperature_2m);
+  const hours = hourlyData.map(item => `${new Date(item.time).getHours()}h`);
+
+  return (
+    <View style={[styles.container, { justifyContent: 'flex-start' }]}>
+      <Text style={styles.title}>
+        {State}
+        {'\n'}
+        {weatherData?.cityName}
+      </Text>
+
+      {/* GRÁFICO DE TEMPERATURA */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <LineChart
+          data={{
+            labels: hours.filter((_, i) => i % 2 === 0),
+            datasets: [{ data: temperatures }],
+          }}
+          width={screenWidth - 32}
+          height={330}
+          yAxisSuffix="°"
+          chartConfig={{
+            backgroundColor: '#1F2C2F',
+            backgroundGradientFrom: '#1F2C2F',
+            backgroundGradientTo: '#1F2C2F',
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(245, 210, 124, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            propsForDots: {
+              r: '5',
+              strokeWidth: '2',
+              stroke: '#F5D27C',
+            },
+          }}
+          bezier
+          style={{
+            borderRadius: 16,
+            marginBottom: 24,
+          }}
+        />
+      </ScrollView>
+
+      {/* FLATLIST HORIZONTAL COM HORAS */}
+      <FlatList
+        horizontal
+        data={weatherData.hourly.slice(0, 24)}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.hourItem}>
+            <View style={styles.weatherInfo}>
               <Text style={styles.timeText}>
                 {new Date(item.time).getHours()}h
               </Text>
-
-              <View style={styles.weatherInfo}>
-                <WeatherIcon code={item.weather_code} size={24} />
-                <Text style={styles.tempText}>
-                  {Math.round(item.temperature_2m)}°
+              <WeatherIcon code={item.weather_code} size={24} />
+              <Text style={styles.tempText}>
+                {Math.round(item.temperature_2m)}°
+              </Text>
+              <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
+                <Text style={styles.windText}>
+                  {Math.round(item.wind_speed_10m)} km/h
+                </Text>
+                <Text>
+                  <MaterialIcons name={"air"} size={12} color={'rgb(253 233 183)'} />
                 </Text>
               </View>
-
-              <Text style={styles.windText}>
-                {Math.round(item.wind_speed_10m)} km/h
-              </Text>
             </View>
-          )}
-          ListHeaderComponent={
-            <View style={styles.header}>
-              <Text style={styles.headerText}>Hora</Text>
-              <Text style={styles.headerText}>Temp.</Text>
-              <Text style={styles.headerText}>Vento</Text>
-            </View>
-          }
-        />
-      )}
-    </View>
+          </View>
+        )
+        }
+      />
+    </View >
   );
 };
 
@@ -70,51 +119,48 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    //backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    marginBottom: 8,
-  },
-  headerText: {
-    fontWeight: 'bold',
-    width: '33%',
+    color: '#f3f2ef',
     textAlign: 'center',
   },
   hourItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
-  },
-  timeText: {
-    width: '33%',
-    textAlign: 'center',
+    paddingHorizontal: 4,
+    paddingBottom: 100,
   },
   weatherInfo: {
-    flexDirection: 'row',
+    width: 100,
+    height: 120,
+    borderRadius: 24,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    padding: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    width: '33%',
+  },
+  timeText: {
+    color: '#ccc',
+    fontSize: 14,
+    marginBottom: 4,
+    fontWeight: '500'
   },
   tempText: {
-    marginLeft: 8,
+    color: '#f3f2ef',
+    fontWeight: 'bold',
   },
   windText: {
-    width: '33%',
     textAlign: 'center',
+    color: 'rgb(253 233 183)',
+    fontWeight: '600',
+    fontSize: 12,
   },
   errorText: {
     fontSize: 16,
