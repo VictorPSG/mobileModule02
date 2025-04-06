@@ -32,23 +32,16 @@ export const CurrentlyScreen = ({ weatherData, loading, error, State }) => {
 			{weatherData && (
 				<View style={styles.weatherContainer}>
 					<View style={styles.currentWeather}>
-						{/* <WeatherIcon code={weatherData.current.weather_code} size={64} /> */}
 						<Text style={styles.temperature}>
 							{Math.round(weatherData.current.temperature_2m)}°C
 						</Text>
 					</View>
 					<View style={styles.weatherDetails}>
-						{/* <View style={styles.detailItem}>
-							<MaterialIcons name="water" size={20} color="#f3f2ef " fontWeight="500" />
-							<Text>{weatherData.current.relative_humidity_2m}%</Text>
-						</View> */}
 						<View style={styles.detailItem}>
 							<MaterialIcons name="air" size={20} color="#f3f2ef" />
 							<Text style={{ color: 'rgb(253 233 183)', fontWeight: 'bold' }}>{weatherData.current.wind_speed_10m} km/h</Text>
 						</View>
 						<View style={styles.detailItem}>
-							{/* <MaterialIcons name="speed" size={20} color="#f3f2ef" />
-							<Text>{weatherData.current.surface_pressure} hPa</Text> */}
 							<WeatherIcon code={weatherData.current.weather_code} size={20} />
 							<Text style={{ color: 'rgb(253 233 183)', fontWeight: 'bold', textAlign: 'center' }}>
 								{getWeatherDescription(weatherData.current.weather_code)}

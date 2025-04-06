@@ -14,6 +14,7 @@ import { WeatherIcon } from '../assets/weatherIcon.js';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height
 
 export const TodayScreen = ({ weatherData, loading, error, State }) => {
   if (loading) {
@@ -45,7 +46,7 @@ export const TodayScreen = ({ weatherData, loading, error, State }) => {
   const hours = hourlyData.map(item => `${new Date(item.time).getHours()}h`);
 
   return (
-    <View style={[styles.container, { justifyContent: 'flex-start' }]}>
+    <View style={styles.container}>
       <Text style={styles.title}>
         {State}
         {'\n'}
@@ -59,7 +60,7 @@ export const TodayScreen = ({ weatherData, loading, error, State }) => {
           legend: ["Temperatura em °C"],
         }}
         width={screenWidth - 32}
-        height={330}
+        height={screenHeight / 2.56}
         yAxisSuffix="°"
         chartConfig={{
           backgroundColor: '#1F2C2F',
@@ -113,6 +114,7 @@ export const TodayScreen = ({ weatherData, loading, error, State }) => {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: 'center',
     flex: 1,
     padding: 16,
   },

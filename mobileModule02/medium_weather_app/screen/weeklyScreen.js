@@ -13,6 +13,7 @@ import { styles as sharedStyles } from "../styles";
 import { MaterialIcons } from '@expo/vector-icons';
 
 const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height
 
 export const WeeklyScreen = ({ weatherData, loading, error, State }) => {
 	if (loading) {
@@ -50,65 +51,73 @@ export const WeeklyScreen = ({ weatherData, loading, error, State }) => {
 	const minTemps = dailyData.map(item => item.temperature_2m_min);
 
 	return (
-		<View style={{ flex: 1, padding: 16 }}>
+		<View style={{ flex: 1, padding: 16, alignItems: 'center' }}>
 			<Text style={sharedStyles.screenTitle}>{State}{'\n'}{weatherData?.cityName}</Text>
 
 			{/* GRÁFICO */}
-			<LineChart
-				data={{
-					labels,
-					datasets: [
-						{ data: maxTemps, color: () => '#F5D27C' },
-						{ data: minTemps, color: () => '#72A1E5' },
-					],
-					legend: ['Máx °C', 'Mín °C'],
-				}}
-				width={screenWidth - 32}
-				height={330}
-				yAxisSuffix="°"
-				chartConfig={{
-					backgroundColor: '#1F2C2F',
-					backgroundGradientFrom: '#1F2C2F',
-					backgroundGradientTo: '#1F2C2F',
-					decimalPlaces: 0,
-					color: (opacity = 1) => `rgba(245, 210, 124, ${opacity})`,
-					labelColor: () => '#D0CFCB',
-				}}
-				bezier
-				style={{ borderRadius: 16 }}
-			/>
-
+			<View style={{ backgroundColor: '#1F2C2F', borderRadius: 16 }}>
+				<LineChart
+					data={{
+						labels,
+						datasets: [
+							{ data: maxTemps, color: () => '#F5D27C' },
+							{ data: minTemps, color: () => '#72A1E5' },
+						],
+						legend: ['Máx °C', 'Mín °C'],
+					}}
+					width={screenWidth / 1.083}
+					height={screenHeight / 2.56}
+					yAxisSuffix="°"
+					chartConfig={{
+						backgroundColor: '#1F2C2F',
+						backgroundGradientFrom: '#1F2C2F',
+						backgroundGradientTo: '#1F2C2F',
+						decimalPlaces: 0,
+						color: (opacity = 1) => `rgba(245, 210, 124, ${opacity})`,
+						labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+						propsForDots: {
+							r: '5',
+							strokeWidth: '2',
+							stroke: '#F5D27C',
+						},
+					}}
+					bezier
+					style={{ borderRadius: 16 }}
+				/>
+			</View>
 			{/* LISTA DE PREVISÃO DA SEMANA */}
-			<FlatList
-				horizontal
-				data={dailyData}
-				keyExtractor={(item, index) => index.toString()}
-				renderItem={({ item }) => (
-					<View style={{ paddingHorizontal: 4, justifyContent: 'flex-end', marginBottom: '60' }}>
-						<View style={localStyles.forecastItem}>
-							<Text style={localStyles.forecastDate}>
-								{new Date(item.time).toLocaleDateString('pt-BR', {
-									day: '2-digit',
-									month: '2-digit',
-								})}
-							</Text>
-							<View style={localStyles.forecastTempContainer}>
-								<WeatherIcon code={item.weather_code} size={32} />
-								<Text style={localStyles.forecastTemp}>
-									{Math.round(item.temperature_2m_max)}° / {Math.round(item.temperature_2m_min)}°
+			<View style={{ flex: 1, justifyContent: 'flex-end' }}>
+				<FlatList
+					horizontal
+					data={dailyData}
+					keyExtractor={(item, index) => index.toString()}
+					renderItem={({ item }) => (
+						<View style={{ paddingHorizontal: 4, justifyContent: 'flex-end' }}>
+							<View style={localStyles.forecastItem}>
+								<Text style={localStyles.forecastDate}>
+									{new Date(item.time).toLocaleDateString('pt-BR', {
+										day: '2-digit',
+										month: '2-digit',
+									})}
 								</Text>
-								<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-									<Text style={localStyles.forecastDetail}>{item.wind_speed_10m_max}km/h</Text>
-									<MaterialIcons name={"air"} size={12} color={'rgb(253 233 183)'} />
+								<View style={localStyles.forecastTempContainer}>
+									<WeatherIcon code={item.weather_code} size={32} />
+									<Text style={localStyles.forecastTemp}>
+										{Math.round(item.temperature_2m_min)}° / {Math.round(item.temperature_2m_max)}°
+									</Text>
+									<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+										<Text style={localStyles.forecastDetail}>{item.wind_speed_10m_max}km/h</Text>
+										<MaterialIcons name={"air"} size={12} color={'rgb(253 233 183)'} />
+									</View>
 								</View>
 							</View>
 						</View>
-					</View>
-				)
-				}
-				contentContainerStyle={localStyles.forecastList}
-				showsHorizontalScrollIndicator={false}
-			/>
+					)
+					}
+					contentContainerStyle={localStyles.forecastList}
+					showsHorizontalScrollIndicator={false}
+				/>
+			</View>
 		</View >
 	);
 };
@@ -122,6 +131,7 @@ const localStyles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: 'rgba(255,255,255,0.15)',
 		padding: 8,
+		marginBottom: 70
 	},
 	forecastDate: {
 		color: '#ccc',
@@ -154,6 +164,6 @@ const localStyles = StyleSheet.create({
 		fontSize: 12,
 	},
 	forecastList: {
-		paddingVertical: 10,
+		// paddingVertical: 10,
 	},
 });

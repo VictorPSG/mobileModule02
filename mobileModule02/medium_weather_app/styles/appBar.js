@@ -14,7 +14,6 @@ export const appBarStyles = StyleSheet.create({
 	searchContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		// backgroundColor: 'white',
 		borderRadius: 20,
 		paddingHorizontal: 12,
 		paddingVertical: 8,
@@ -25,7 +24,6 @@ export const appBarStyles = StyleSheet.create({
 	},
 	searchContainerFocused: {
 		borderColor: '#4A90E2',
-		// backgroundColor: 'white',
 	},
 	searchInput: {
 		flex: 1,

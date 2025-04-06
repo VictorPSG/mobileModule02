@@ -17,6 +17,9 @@ import { TodayScreen } from './screen/todayScreen.js';
 import { CurrentlyScreen } from './screen/currentlyScreen.js';
 import { WeeklyScreen } from './screen/weeklyScreen.js';
 import { AppBar } from './appBar.js';
+import { ScreenContainer } from 'react-native-screens';
+import { enableScreens } from 'react-native-screens';
+enableScreens();
 
 import {
   useNavigation,
@@ -97,7 +100,6 @@ const App = () => {
         throw new Error('Formato de dados inválido da API');
       }
 
-      // Filtro simplificado - verificamos apenas se tem coordenadas
       const filteredData = data.filter(item =>
         item.lat && item.lon
       );
@@ -188,19 +190,15 @@ const App = () => {
     setError(null);
 
     try {
-      // 1. Solicitar permissão de localização
       let { status } = await Location.requestForegroundPermissionsAsync();
 
       if (status !== 'granted') {
         throw new Error('Permissão de localização negada');
       }
-      // 2. Obter coordenadas atuais
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
-      // 3. Obter nome da cidade usando reverse geocoding
       const cityName = await getCityName(latitude, longitude);
-      // 4. Buscar dados meteorológicos com o nome da cidade
       await fetchWeatherData(
         latitude,
         longitude,
@@ -229,7 +227,6 @@ const App = () => {
       setState(data[0].state);
       const name_and_country = data[0].local_names.pt + ", " + data[0].country;
       if (Array.isArray(data) && data.length > 0) {
-        // Retorna o nome local em português se disponível, senão o nome padrão
         return name_and_country || data[0].name;
       }
 
@@ -241,6 +238,7 @@ const App = () => {
   };
 
   return (
+    // <ScreenContainer style={{ flex: 1 }}>
     <View style={{ flex: 1 }}>
       <StatusBar
         barStyle="white-content"
@@ -267,83 +265,87 @@ const App = () => {
             setShowSuggestions={setShowSuggestions}
             loading={loading}
           />
-          <NavigationContainer theme={MyTheme}>
-            <Tab.Navigator
-              screenOptions={({ route }) => ({
-                tabBarIcon: ({ focused, color, size }) => {
-                  let iconName;
+          <View style={{ flex: 1 }}>
+            <NavigationContainer theme={MyTheme}>
+              <Tab.Navigator
+                // detachInactiveScreens={Platform.OS !== 'web'}
+                screenOptions={({ route }) => ({
+                  tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
 
-                  if (route.name === 'Currently') {
-                    iconName = 'schedule';
-                  } else if (route.name === 'Today') {
-                    iconName = 'today';
-                  } else if (route.name === 'Weekly') {
-                    iconName = 'date-range';
-                  }
+                    if (route.name === 'Currently') {
+                      iconName = 'schedule';
+                    } else if (route.name === 'Today') {
+                      iconName = 'today';
+                    } else if (route.name === 'Weekly') {
+                      iconName = 'date-range';
+                    }
 
-                  return <MaterialIcons name={iconName} size={size} color={color} />;
-                },
-                tabBarActiveTintColor: '#F5D27C',
-                tabBarInactiveTintColor: 'rgba(255,255,255,0.6)',
-                headerShown: false,
-                tabBarStyle: {
-                  backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                  position: 'absolute',
-                  borderTopWidth: 0,
-                  borderRadius: 30,
-                  marginHorizontal: 20,
-                  marginBottom: 20,
-                  height: 60,
-                  paddingBottom: 10,
-                  elevation: 0,
-                },
-                tabBarLabelStyle: {
-                  fontSize: 14,
-                  fontWeight: '500',
-                },
-              })}
-            >
-              <Tab.Screen name="Currently">
-                {() => (
-                  <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-                    <CurrentlyScreen
-                      weatherData={weatherData}
-                      loading={loading}
-                      error={error}
-                      State={State}
-                    />
-                  </View>
-                )}
-              </Tab.Screen>
-              <Tab.Screen name="Today">
-                {() => (
-                  <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-                    <TodayScreen
-                      weatherData={weatherData}
-                      loading={loading}
-                      error={error}
-                      State={State}
-                    />
-                  </View>
-                )}
-              </Tab.Screen>
-              <Tab.Screen name="Weekly">
-                {() => (
-                  <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-                    <WeeklyScreen
-                      weatherData={weatherData}
-                      loading={loading}
-                      error={error}
-                      State={State}
-                    />
-                  </View>
-                )}
-              </Tab.Screen>
-            </Tab.Navigator>
-          </NavigationContainer>
+                    return <MaterialIcons name={iconName} size={size} color={color} />;
+                  },
+                  tabBarActiveTintColor: '#F5D27C',
+                  tabBarInactiveTintColor: 'rgba(255,255,255,0.6)',
+                  headerShown: false,
+                  tabBarStyle: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                    position: 'absolute',
+                    borderTopWidth: 0,
+                    borderRadius: 30,
+                    marginHorizontal: 20,
+                    marginBottom: 20,
+                    height: 60,
+                    paddingBottom: 5,
+                    elevation: 0,
+                  },
+                  tabBarLabelStyle: {
+                    fontSize: 14,
+                    fontWeight: '500',
+                  },
+                })}
+              >
+                <Tab.Screen name="Currently">
+                  {() => (
+                    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+                      <CurrentlyScreen
+                        weatherData={weatherData}
+                        loading={loading}
+                        error={error}
+                        State={State}
+                      />
+                    </View>
+                  )}
+                </Tab.Screen>
+                <Tab.Screen name="Today">
+                  {() => (
+                    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+                      <TodayScreen
+                        weatherData={weatherData}
+                        loading={loading}
+                        error={error}
+                        State={State}
+                      />
+                    </View>
+                  )}
+                </Tab.Screen>
+                <Tab.Screen name="Weekly">
+                  {() => (
+                    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+                      <WeeklyScreen
+                        weatherData={weatherData}
+                        loading={loading}
+                        error={error}
+                        State={State}
+                      />
+                    </View>
+                  )}
+                </Tab.Screen>
+              </Tab.Navigator>
+            </NavigationContainer>
+          </View>
         </SafeAreaView>
       </ImageBackground>
     </View>
+    //</ScreenContainer >
   );
 };
 

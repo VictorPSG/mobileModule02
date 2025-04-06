@@ -44,7 +44,6 @@ export const AppBar = ({
 						setIsFocused(false);
 						setTimeout(() => setShowSuggestions(false), 200);
 					}}
-					// returnKeyType="Search"
 					onSubmitEditing={() => { }}
 				/>
 				{loading ? (
